@@ -13,6 +13,43 @@ class _CarregadoState extends State<Carregado> {
   late Map<dynamic, dynamic> safeCotacao;
   late double dolar;
   late double euro;
+  final TextEditingController _RealC = TextEditingController();
+  final TextEditingController _DolarC = TextEditingController();
+  final TextEditingController _EuroC = TextEditingController();
+
+  void _RealChanged(String text) {
+    if(text.isEmpty){
+      _ClearAll();
+    }
+    double real = double.parse(text);
+    _DolarC.text = (real/dolar).toStringAsFixed(2);
+    _EuroC.text = (real/dolar).toStringAsFixed(2);
+  }
+
+  void _DolarChanged(String text) {
+    if(text.isEmpty){
+      _ClearAll();
+    }
+    double dolar = double.parse(text);
+    _RealC.text = (dolar * this.dolar).toStringAsFixed(2);
+    _EuroC.text = (dolar * this.dolar/euro).toStringAsFixed(2);
+  }
+
+  void _ClearAll(){
+    _RealC.text = "";
+    _DolarC.text = "";
+    _EuroC.text = "";
+
+
+  }
+  void _EuroChanged(String text) {
+    if (text.isEmpty) {
+      _ClearAll();
+    }
+    double euro = double.parse(text);
+    _RealC.text = (euro * this.euro).toStringAsFixed(2);
+    _DolarC .text = (euro * this.euro/dolar).toStringAsFixed(2);
+  }
 
   @override
   void initState() {
@@ -36,9 +73,9 @@ class _CarregadoState extends State<Carregado> {
               color: Colors.amber,
               size: 120,
             ),
-            BuildTextFiled("Dolar", "\$"),
-            BuildTextFiled("Real", "R\$"),
-            BuildTextFiled("Euro", "\€"),
+            BuildTextFiled("Dolar", "\$", _DolarC,_DolarChanged),
+            BuildTextFiled("Real", "R\$", _RealC,_RealChanged),
+            BuildTextFiled("Euro", "\€", _EuroC,_EuroChanged),
           ],
         ),
       ),
@@ -46,8 +83,10 @@ class _CarregadoState extends State<Carregado> {
   }
 }
 
-Widget BuildTextFiled(String text, String prefix) {
+Widget BuildTextFiled(
+    String text, String prefix, TextEditingController c, Function f) {
   return TextField(
+    controller: c,
     decoration: InputDecoration(
       labelText: text,
       labelStyle: TextStyle(
@@ -67,5 +106,7 @@ Widget BuildTextFiled(String text, String prefix) {
     style: TextStyle(
       color: Colors.amber,
     ),
+    onChanged: (value) => f(value),
+    keyboardType: TextInputType.numberWithOptions(decimal: true),
   );
 }
